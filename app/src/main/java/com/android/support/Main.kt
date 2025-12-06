@@ -1,5 +1,6 @@
 package com.android.support
 
+import android.app.Activity
 import android.content.Context
 import android.widget.Toast
 
@@ -12,7 +13,12 @@ class Main {
 
         @JvmStatic
         fun start(context: Context) {
-            val menu = Menu(context)
+            //Check if context is an Activity.
+            if (context is Activity) {
+                Menu(context)
+            } else {
+                Toast.makeText(context, "Failed to launch the mod menu\n", Toast.LENGTH_LONG).show()
+            }
         }
     }
 

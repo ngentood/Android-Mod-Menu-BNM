@@ -35,8 +35,13 @@ Java_com_android_support_Menu_getFeatureList(JNIEnv *env, jobject thiz) {
 bool currencies = false;
 int reward = 1;
 extern "C" JNIEXPORT void JNICALL
-Java_com_android_support_Menu_valueChange(JNIEnv *env, jobject thiz, jint featIdx,
-                                                jobject value) {
+Java_com_android_support_Menu_valueChange(
+        JNIEnv *env,
+        jobject thiz,
+        jint featIdx,
+        jstring featName,
+        jobject value
+) {
     switch (featIdx) {
         case 0: {
             currencies = toJboolean(env, value);

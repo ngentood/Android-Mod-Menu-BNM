@@ -23,9 +23,10 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.SeekBar
-import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.widget.SwitchCompat
+import androidx.core.content.edit
 import androidx.core.graphics.toColorInt
 import androidx.core.view.setPadding
 
@@ -49,12 +50,16 @@ val TEXT_COLOR = "#82CAFD".toColorInt()
 val TEXT_COLOR_2 = "#FFFFFF".toColorInt()
 val CATEGORY_BG_COLOR = "#2F3D4C".toColorInt()
 
-class Menu(val context: Context) {
+class Menu(val context: Activity) {
 
     val rootFrame: FrameLayout = FrameLayout(context)
     val menuContainer: LinearLayout = LinearLayout(context)
     val startIcon = ImageView(context)
 
+    val sharedPreferences = context.getSharedPreferences(
+        context.packageName + "_preferences",
+        Context.MODE_PRIVATE
+    )
     val onTouchListener = object : OnTouchListener {
         var dx: Float = 0f
         var dy: Float = 0f
@@ -74,7 +79,7 @@ class Menu(val context: Context) {
                     var params = rootFrame.layoutParams as WindowManager.LayoutParams
                     params.x = (event.rawX + dx).toInt()
                     params.y = (event.rawY + dy).toInt()
-                    val windowManager = (context as Activity).windowManager
+                    val windowManager = context.windowManager
                     var bounds = windowManager.currentWindowMetrics.bounds
                     if (params.x < POS_X) params.x = POS_X
                     else if (params.x > bounds.right - rootFrame.width - POS_X) {
@@ -121,7 +126,7 @@ class Menu(val context: Context) {
             PixelFormat.TRANSPARENT
         )
         frameParams.gravity = Gravity.TOP or Gravity.LEFT
-        (context as Activity).windowManager.addView(rootFrame, frameParams)
+        context.windowManager.addView(rootFrame, frameParams)
     }
 
     fun initStartIcon() {
@@ -284,13 +289,31 @@ class Menu(val context: Context) {
                 }
             }
         }
-
         scrollView.addView(mods)
         return scrollView
     }
 
+
     external fun getFeatureList(): Array<String>?
-    external fun valueChange(featIdx: Int, value: Any)
+    external fun valueChange(featIdx: Int, featName: String, value: Any)
+
+    fun <T> read(key: String, defaultValue: T): T {
+        return when (defaultValue) {
+            is String -> sharedPreferences.getString(key, defaultValue) ?: defaultValue
+            is Int -> sharedPreferences.getInt(key, defaultValue)
+            is Boolean -> sharedPreferences.getBoolean(key, defaultValue)
+            else -> defaultValue
+        } as T
+    }
+
+    fun write(key: String, value: Any) {
+        when (value) {
+            is String -> sharedPreferences.edit { putString(key, value) }
+            is Int -> sharedPreferences.edit { putInt(key, value) }
+            is Boolean -> sharedPreferences.edit { putBoolean(key, value) }
+            else -> println("The value is of an unknown type.")
+        }
+    }
 
 
     private fun category(name: String): View {
@@ -305,9 +328,11 @@ class Menu(val context: Context) {
     }
 
     private fun toggle(featIdx: Int, featName: String, defaultValue: Boolean = false): View {
-        val switch = Switch(context)
+        val isChecked = read(featName, defaultValue)
+        valueChange(featIdx, featName, isChecked)
+        val switch = SwitchCompat(context)
         switch.text = featName
-        switch.isChecked = defaultValue
+        switch.isChecked = isChecked
         switch.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
@@ -315,7 +340,8 @@ class Menu(val context: Context) {
         switch.setTextColor(TEXT_COLOR_2)
         switch.setPadding(20)
         switch.setOnCheckedChangeListener { buttonView, isChecked ->
-            valueChange(featIdx, isChecked)
+            write(featName, isChecked)
+            valueChange(featIdx, featName, isChecked)
         }
         return switch
     }
@@ -327,6 +353,9 @@ class Menu(val context: Context) {
         max: Int,
         defaultValue: Int = min
     ): View {
+        val process = read(featName, defaultValue)
+        valueChange(featIdx, featName, process)
+
         val linearLayout = LinearLayout(context)
         linearLayout.orientation = LinearLayout.VERTICAL
         linearLayout.setPadding(20)
@@ -355,7 +384,7 @@ class Menu(val context: Context) {
 
         val value = TextView(context)
         value.setTextColor(TEXT_COLOR)
-        value.text = defaultValue.toString()
+        value.text = process.toString()
         value.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.WRAP_CONTENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
@@ -368,7 +397,7 @@ class Menu(val context: Context) {
         val seekbar = SeekBar(context)
         seekbar.min = min
         seekbar.max = max
-        seekbar.progress = defaultValue
+        seekbar.progress = process
         seekbar.layoutParams = LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -376,7 +405,8 @@ class Menu(val context: Context) {
         seekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 value.text = progress.toString()
-                valueChange(featIdx, progress)
+                write(featName, progress)
+                valueChange(featIdx, featName, progress)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
