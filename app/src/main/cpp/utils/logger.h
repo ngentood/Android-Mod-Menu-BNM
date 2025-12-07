@@ -13,11 +13,11 @@
 enum LogType {
     oDEBUG = 3,
     oERROR = 6,
-    oINFO  = 4,
-    oWARN  = 5
+    oINFO = 4,
+    oWARN = 5
 };
 
-#define TAG "Mod_Menu"
+#define TAG "Mod_Menu_BNM"
 
 #define LOGD(...) ((void)__android_log_print(oDEBUG, TAG, __VA_ARGS__))
 #define LOGE(...) ((void)__android_log_print(oERROR, TAG, __VA_ARGS__))

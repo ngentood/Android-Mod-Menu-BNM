@@ -3,12 +3,11 @@
 #include <thread>
 
 #include "logger.h"
-#include "BNM/Image.hpp"
-#include "BNM/Class.hpp"
+#include <BNM/Image.hpp>
+#include <BNM/Class.hpp>
 #include <BNM/Field.hpp>
 #include <BNM/Method.hpp>
-
-#include "BNM/Loading.hpp"
+#include <BNM/Loading.hpp>
 #include "utils.h"
 
 void OnLoaded();
@@ -22,7 +21,11 @@ JNI_OnLoad(JavaVM *vm, void *reserved) {
     return JNI_VERSION_1_6;
 }
 
-
+// FeatureTypes: Toggle, Seekbar, Category
+// Examples:
+// Toggle:ToggleName:true
+// Seekbar:SeekbarName:1_20_10
+// Category:CategoryName
 extern "C" JNIEXPORT jobjectArray JNICALL
 Java_com_android_support_Menu_getFeatureList(JNIEnv *env, jobject thiz) {
     std::string featList[] = {
@@ -42,6 +45,7 @@ Java_com_android_support_Menu_valueChange(
         jstring featName,
         jobject value
 ) {
+    // featIdx: index in feature list
     switch (featIdx) {
         case 0: {
             currencies = toJboolean(env, value);
