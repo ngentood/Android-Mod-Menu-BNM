@@ -10,8 +10,6 @@
 #include <BNM/Loading.hpp>
 #include "utils.h"
 
-using namespace std;
-using namespace BNM;
 
 void OnLoaded();
 
@@ -19,8 +17,8 @@ extern "C" JNIEXPORT jint JNICALL
 JNI_OnLoad(JavaVM *vm, void *reserved) {
     JNIEnv *env;
     vm->GetEnv((void **) &env, JNI_VERSION_1_6);
-    Loading::AddOnLoadedEvent(OnLoaded);
-    Loading::TryLoadByJNI(env);
+    BNM::Loading::AddOnLoadedEvent(OnLoaded);
+    BNM::Loading::TryLoadByJNI(env);
     return JNI_VERSION_1_6;
 }
 
@@ -31,11 +29,11 @@ JNI_OnLoad(JavaVM *vm, void *reserved) {
 // Category:CategoryName
 extern "C" JNIEXPORT jobjectArray JNICALL
 Java_com_android_support_Menu_getFeatureList(JNIEnv *env, jobject thiz) {
-    string featList[] = {
+    std::string featList[] = {
             "Toggle:Currencies",
             "Seekbar:Reward:1_10",
     };
-    return toJobjectArray(env, featList, size(featList));
+    return toJobjectArray(env, featList, std::size(featList));
 }
 
 bool currencies = false;
@@ -86,10 +84,10 @@ bool CurrenciesSpend(void *instance, int type, int value, void *param) {
 // Example Game: [Horny Villa](https://www.nutaku.net/games/horny-villa/)
 void OnLoaded() {
     LOGI("OnLoaded");
-    auto AssemblyCSharp = Image("Assembly-CSharp");
-    auto Currencies = Class("StripClub.Model", "Currencies", AssemblyCSharp);
+    auto AssemblyCSharp = BNM::Image("Assembly-CSharp");
+    auto Currencies = BNM::Class("StripClub.Model", "Currencies", AssemblyCSharp);
     auto Spend = Currencies.GetMethod("Spend", 3);
     auto TryAdd = Currencies.GetMethod("TryAdd", 3);
-    BasicHook(Spend, CurrenciesSpend, old_CurrenciesSpend);
-    BasicHook(TryAdd, CurrenciesTryAdd, old_CurrenciesTryAdd);
+    BNM::BasicHook(Spend, CurrenciesSpend, old_CurrenciesSpend);
+    BNM::BasicHook(TryAdd, CurrenciesTryAdd, old_CurrenciesTryAdd);
 }
