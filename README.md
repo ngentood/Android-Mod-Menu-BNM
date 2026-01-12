@@ -51,7 +51,7 @@ apktool d -f game.apk
 
 ```zsh
 cp app-debug/lib/${ARCH_ABI}/libModBNM.so game/lib/${ARCH_ABI}/libModBNM.so
-cp -r app-debug/smali_classes{2,3,4,5} game/
+cp -r app-debug/smali_classes* game/
 ```
 
 ## Update `game`'s main activity
