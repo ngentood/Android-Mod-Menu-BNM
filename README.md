@@ -59,17 +59,22 @@ cp -r app-debug/smali_classes* game/
 1. find `main` activity in `game/AndroidManifest.xml`
 
    ```xml
-   <activity
-       android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|density|layoutDirection|fontScale"
-       android:exported="true" android:hardwareAccelerated="false" android:label="@string/app_name"
-       android:launchMode="singleTask" android:maxAspectRatio="2.0"
-       android:name="com.nutaku.unity.UnityPlayerActivity" android:resizeableActivity="false"
-       android:screenOrientation="userLandscape">
-       <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
-   </activity>
+    <activity android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|density|layoutDirection|fontScale" android:exported="true" android:hardwareAccelerated="true" android:launchMode="singleTask" android:maxAspectRatio="2.0" android:name="com.unity3d.player.UnityPlayerActivity" android:resizeableActivity="false" android:screenOrientation="userLandscape" android:theme="@style/UnityThemeSelector">
+        <intent-filter>
+            <category android:name="android.intent.category.LAUNCHER"/>
+            <action android:name="android.intent.action.MAIN"/>
+        </intent-filter>
+        <intent-filter>
+            <category android:name="android.intent.category.DEFAULT"/>
+            <category android:name="android.intent.category.BROWSABLE"/>
+            <data android:host="callback" android:path="/param" android:scheme="com.greent.hornymerge"/>
+            <action android:name="android.intent.action.VIEW"/>
+        </intent-filter>
+        <meta-data android:name="unityplayer.UnityActivity" android:value="true"/>
+    </activity>
    ```
 
-2. edit `onCreate` method in `game/smali/com/nutaku/unity/UnityPlayerActivity.smali`
+2. edit `onCreate` method in `game/smali/com/unity3d/player/UnityPlayerActivity.smali`
 
    ```smali
    .method protected onCreate(Landroid/os/Bundle;)V
