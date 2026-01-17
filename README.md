@@ -59,7 +59,7 @@ cp -r app-debug/smali_classes* game/
 1. find `main` activity in `game/AndroidManifest.xml`
 
    ```xml
-    <activity android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|orientation|screenLayout|uiMode|screenSize|smallestScreenSize|density|layoutDirection|fontScale" android:exported="true" android:hardwareAccelerated="true" android:launchMode="singleTask" android:maxAspectRatio="2.0" android:name="com.unity3d.player.UnityPlayerActivity" android:resizeableActivity="false" android:screenOrientation="userLandscape" android:theme="@style/UnityThemeSelector">
+    <activity android:name="com.unity3d.player.UnityPlayerActivity">
         <intent-filter>
             <category android:name="android.intent.category.LAUNCHER"/>
             <action android:name="android.intent.action.MAIN"/>
