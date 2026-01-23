@@ -6,7 +6,9 @@ Floating mod menu for il2cpp base on [ByNameModding](https://github.com/ByNameMo
 
 # Getting Start
 
-## Edit and Build Android-Mod-Menu-BNM with [Android Studio](https://developer.android.com/studio)
+## Download [app-debug.apk](https://github.com/fourcels/Android-Mod-Menu-BNM/releases/latest/download/app-debug.apk)
+
+## Build `app-debug.apk` with [Android Studio](https://developer.android.com/studio) `[optional]`
 
 1. edit `app/com/android/support/Menu.kt`
 
