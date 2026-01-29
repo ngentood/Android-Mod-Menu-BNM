@@ -2,6 +2,7 @@
 // Created by Ken on 2025/11/30.
 //
 
+#include <vector>
 #include "utils.h"
 
 // jobject -> jboolean (JNI_TRUE/JNI_FALSE)
@@ -47,23 +48,23 @@ jint toJint(JNIEnv *env, jobject obj) {
     return 0; // unsupported type; choose your policy
 }
 
-// string[] -> jobjectArray
-jobjectArray toJobjectArray(JNIEnv *env, std::string arr[], int size) {
+// vector<string> -> jobjectArray
+jobjectArray toJobjectArray(JNIEnv *env, const std::vector<std::string> &feats) {
     jclass stringClass = env->FindClass("java/lang/String");
     if (stringClass == nullptr) {
         return nullptr;
     }
     jobjectArray ret = env->NewObjectArray(
-            size,          // length(),
-            stringClass,          // elementClass
-            nullptr                  // initialElement (can be NULL or a default String object)
+            static_cast<int>(feats.size()),
+            stringClass,
+            nullptr
     );
     if (ret == nullptr) {
         return nullptr;
     }
 
-    for (int i = 0; i < size; ++i) {
-        jstring javaString = env->NewStringUTF(arr[i].c_str());
+    for (int i = 0; i < feats.size(); i++) {
+        jstring javaString = env->NewStringUTF(feats[i].c_str());
         if (javaString == nullptr) {
             // Handle error: String conversion failed
             // You might need to release previously created objects here
@@ -73,6 +74,5 @@ jobjectArray toJobjectArray(JNIEnv *env, std::string arr[], int size) {
         env->DeleteLocalRef(javaString); // Release local reference
     }
 
-    // 5. Return the Java array
     return ret;
 }

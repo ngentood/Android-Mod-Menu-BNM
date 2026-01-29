@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <string>
 #include <thread>
+#include <vector>
 
 #include "logger.h"
 #include <BNM/Image.hpp>
@@ -29,17 +30,22 @@ JNI_OnLoad(JavaVM *vm, void *reserved) {
 // Category:CategoryName
 extern "C" JNIEXPORT jobjectArray JNICALL
 Java_com_android_support_Menu_getFeatureList(JNIEnv *env, jobject thiz) {
-    std::string featList[] = {
+    std::vector<std::string> feats = {
             "Toggle:Currencies",
             "Toggle:Promote Progress:true",
             "Seekbar:Reward:1_10",
     };
-    return toJobjectArray(env, featList, std::size(featList));
+    return toJobjectArray(env, feats);
 }
 
-bool currencies = false;
-bool promote = true;
-int reward = 1;
+struct Feature {
+    bool currencies{};
+    bool promote{};
+    int reward{};
+};
+
+Feature feature{false, true, 1};
+
 extern "C" JNIEXPORT void JNICALL
 Java_com_android_support_Menu_valueChange(
         JNIEnv *env,
@@ -51,15 +57,15 @@ Java_com_android_support_Menu_valueChange(
     // featIdx: index in feature list
     switch (featIdx) {
         case 0: {
-            currencies = toJboolean(env, value);
+            feature.currencies = toJboolean(env, value);
             break;
         }
         case 1: {
-            promote = toJboolean(env, value);
+            feature.promote = toJboolean(env, value);
             break;
         }
         case 2: {
-            reward = toJint(env, value);
+            feature.reward = toJint(env, value);
             break;
         }
         default:
@@ -68,34 +74,35 @@ Java_com_android_support_Menu_valueChange(
 }
 
 
-bool (*old_TryAdd)(void *instance, int type, int amount, void *param);
+bool (*old_CurrenciesTryAdd)(void *instance, int type, int amount, void *param);
 
-bool new_TryAdd(void *instance, int type, int amount, void *param) {
-    return old_TryAdd(instance, type, amount * reward, param);
+bool CurrenciesTryAdd(void *instance, int type, int amount, void *param) {
+    return old_CurrenciesTryAdd(instance, type, amount * feature.reward, param);
 }
 
-bool (*old_Spend)(void *instance, int type, int value, void *param);
+bool (*old_CurrenciesSpend)(void *instance, int type, int value, void *param);
 
-bool new_Spend(void *instance, int type, int value, void *param) {
+bool CurrenciesSpend(void *instance, int type, int value, void *param) {
     if (instance != nullptr) {
-        if (currencies) {
-            new_TryAdd(instance, type, value, param);
+        if (feature.currencies) {
+            CurrenciesTryAdd(instance, type, value, param);
             return true;
         }
     }
-    return old_Spend(instance, type, value, param);
+    return old_CurrenciesSpend(instance, type, value, param);
 }
 
 void (*old_Init)(void *instance, int level, int progress);
 
 void new_Init(void *instance, int level, int progress) {
     if (instance != nullptr) {
-        if (promote) {
+        if (feature.promote) {
             progress = 1000;
         }
     }
     return old_Init(instance, level, progress);
 }
+
 
 // Example Game: [Horny Villa](https://www.nutaku.net/games/horny-villa/)
 void OnLoaded() {
@@ -107,7 +114,7 @@ void OnLoaded() {
     auto Promote = BNM::Class("StripClub.Model.Cards", "Promote", AssemblyCSharp);
     auto Init = Promote.GetMethod("Init");
 
-    BNM::BasicHook(Spend, new_Spend, old_Spend);
-    BNM::BasicHook(TryAdd, new_TryAdd, old_TryAdd);
+    BNM::BasicHook(Spend, CurrenciesSpend, old_CurrenciesSpend);
+    BNM::BasicHook(TryAdd, CurrenciesTryAdd, old_CurrenciesTryAdd);
     BNM::BasicHook(Init, new_Init, old_Init);
 }

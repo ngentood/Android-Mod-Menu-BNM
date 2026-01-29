@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <string>
 #include <thread>
+#include <vector>
 
 #include "logger.h"
 #include <BNM/Image.hpp>
@@ -29,10 +30,10 @@ JNI_OnLoad(JavaVM *vm, void *reserved) {
 // Category:CategoryName
 extern "C" JNIEXPORT jobjectArray JNICALL
 Java_com_android_support_Menu_getFeatureList(JNIEnv *env, jobject thiz) {
-    std::string featList[] = {
+    std::vector<std::string> feats = {
             "Toggle:Infinite Moves",
     };
-    return toJobjectArray(env, featList, std::size(featList));
+    return toJobjectArray(env, feats);
 }
 
 bool moves = false;

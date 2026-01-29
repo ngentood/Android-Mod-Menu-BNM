@@ -12,6 +12,6 @@ jboolean toJboolean(JNIEnv *env, jobject obj);
 
 jint toJint(JNIEnv *env, jobject obj);
 
-jobjectArray toJobjectArray(JNIEnv *env, std::string arr[], int size);
+jobjectArray toJobjectArray(JNIEnv *env, const std::vector<std::string> &feats);
 
 #endif //ANDROID_MOD_MENU_BNM_UTILS_H
