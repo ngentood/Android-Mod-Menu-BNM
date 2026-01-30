@@ -63,7 +63,7 @@ jobjectArray toJobjectArray(JNIEnv *env, const std::vector<std::string> &feats) 
         return nullptr;
     }
 
-    for (int i = 0; i < feats.size(); i++) {
+    for (int i = 0; i < feats.size(); ++i) {
         jstring javaString = env->NewStringUTF(feats[i].c_str());
         if (javaString == nullptr) {
             // Handle error: String conversion failed
