@@ -7,6 +7,7 @@
 
 #include <jni.h>
 #include <string>
+#include <vector>
 
 jboolean toJboolean(JNIEnv *env, jobject obj);
 
