@@ -91,3 +91,16 @@ target_link_libraries(${LIB_NAME}
         BNM
         android
         log)
+
+# wet-wealth
+set(LIB_NAME wet-wealth)
+add_library(${LIB_NAME} SHARED
+        utils/utils.cpp
+        ${LIB_NAME}.cpp)
+
+target_link_libraries(${LIB_NAME}
+        # List libraries link to the target library
+        ${LIBDOBBY_PATH}
+        BNM
+        android
+        log)

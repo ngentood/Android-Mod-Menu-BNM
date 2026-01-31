@@ -27,6 +27,7 @@ import android.widget.SeekBar
 import android.widget.Switch
 import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.edit
 import androidx.core.graphics.toColorInt
 import androidx.core.view.setPadding
@@ -45,7 +46,7 @@ const val POS_X = 20
 const val POS_Y = 50
 
 const val MENU_WIDTH = 290
-const val MENU_HEIGHT = 210
+const val MENU_HEIGHT = 300
 
 val MENU_BG_COLOR = "#EE1C2A35".toColorInt()//#AARRGGBB
 val MENU_FEATURE_BG_COLOR = "#DD141C22".toColorInt() //#AARRGGBB
@@ -237,14 +238,22 @@ class Menu(val context: Activity) {
 
     fun generateFeatureList(): View {
         //********** Mod menu feature list **********
-        val scrollView = ScrollView(context)
 
+        val constraintLayout = ConstraintLayout(context)
+        constraintLayout.layoutParams = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+        )
+
+        val scrollView = ScrollView(context)
+        constraintLayout.addView(scrollView)
         //Auto size. To set size manually, change the width and height example 500, 500
-        scrollView.layoutParams =
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                dp(MENU_HEIGHT)
-            )
+        val layoutParams = ConstraintLayout.LayoutParams(
+            ConstraintLayout.LayoutParams.MATCH_PARENT,
+            ConstraintLayout.LayoutParams.WRAP_CONTENT,
+        )
+        layoutParams.matchConstraintMaxHeight = dp(MENU_HEIGHT)
+        scrollView.layoutParams = layoutParams
         scrollView.setBackgroundColor(MENU_FEATURE_BG_COLOR)
         val mods = LinearLayout(context)
         mods.orientation = LinearLayout.VERTICAL
@@ -295,7 +304,7 @@ class Menu(val context: Activity) {
             }
         }
         scrollView.addView(mods)
-        return scrollView
+        return constraintLayout
     }
 
 

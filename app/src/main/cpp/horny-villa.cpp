@@ -74,22 +74,22 @@ Java_com_android_support_Menu_valueChange(
 }
 
 
-bool (*old_CurrenciesTryAdd)(void *instance, int type, int amount, void *param);
+bool (*old_TryAdd)(void *instance, int type, int amount, void *param);
 
-bool CurrenciesTryAdd(void *instance, int type, int amount, void *param) {
-    return old_CurrenciesTryAdd(instance, type, amount * feature.reward, param);
+bool new_TryAdd(void *instance, int type, int amount, void *param) {
+    return old_TryAdd(instance, type, amount * feature.reward, param);
 }
 
-bool (*old_CurrenciesSpend)(void *instance, int type, int value, void *param);
+bool (*old_Spend)(void *instance, int type, int value, void *param);
 
-bool CurrenciesSpend(void *instance, int type, int value, void *param) {
+bool new_Spend(void *instance, int type, int value, void *param) {
     if (instance != nullptr) {
         if (feature.currencies) {
-            CurrenciesTryAdd(instance, type, value, param);
+            new_TryAdd(instance, type, value, param);
             return true;
         }
     }
-    return old_CurrenciesSpend(instance, type, value, param);
+    return old_Spend(instance, type, value, param);
 }
 
 void (*old_Init)(void *instance, int level, int progress);
@@ -114,7 +114,7 @@ void OnLoaded() {
     auto Promote = BNM::Class("StripClub.Model.Cards", "Promote", AssemblyCSharp);
     auto Init = Promote.GetMethod("Init");
 
-    BNM::BasicHook(Spend, CurrenciesSpend, old_CurrenciesSpend);
-    BNM::BasicHook(TryAdd, CurrenciesTryAdd, old_CurrenciesTryAdd);
+    BNM::BasicHook(TryAdd, new_TryAdd, old_TryAdd);
+    BNM::BasicHook(Spend, new_Spend, old_Spend);
     BNM::BasicHook(Init, new_Init, old_Init);
 }
