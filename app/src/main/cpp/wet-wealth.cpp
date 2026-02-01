@@ -78,6 +78,7 @@ BNM::Class UserCharacterFactory{};
 BNM::Class CharacterStaticUsecase{};
 BNM::Class UserCharactersUsecase{};
 BNM::Class CharacterStatic{};
+BNM::Class List{};
 
 void (*old_AddItem)(void *instance, void *item, int count);
 
@@ -88,7 +89,7 @@ void new_AddItem(void *instance, void *item, int count) {
 void (*old_AddCharacterTemptation)(void *instance, void *character, int added);
 
 void new_AddCharacterTemptation(void *instance, void *character, int added) {
-    return new_AddCharacterTemptation(instance, character, added * feature.temptation);
+    return old_AddCharacterTemptation(instance, character, added * feature.temptation);
 }
 
 void (*old_Load)(void *instance);
@@ -96,17 +97,23 @@ void (*old_Load)(void *instance);
 void new_Load(void *instance) {
     old_Load(instance);
     if (feature.characters) {
-        auto userCharacterFactory = static_cast<BNM::Field<BNM::IL2CPP::Il2CppObject *>>(UserCharacterFactory.GetField(
+        auto userCharacterFactory = static_cast<BNM::Field<BNM::IL2CPP::Il2CppObject *>>(UserCharactersUsecase.GetField(
                 "userCharacterFactory"))[instance]();
-        auto characterStaticUsecase = static_cast<BNM::Field<BNM::IL2CPP::Il2CppObject *>>(CharacterStaticUsecase.GetField(
-                "userCharacterFactory"))[userCharacterFactory]();
-        auto characters = static_cast<BNM::Property<BNM::Structures::Mono::List<BNM::IL2CPP::Il2CppObject *> >>(UserCharacterFactory.GetProperty(
+        auto characterStaticUsecase = static_cast<BNM::Field<BNM::IL2CPP::Il2CppObject *>>(UserCharacterFactory.GetField(
+                "characterStaticUsecase"))[userCharacterFactory]();
+        auto characters = static_cast<BNM::Property<BNM::IL2CPP::Il2CppObject *>>(CharacterStaticUsecase.GetProperty(
                 "Characters"))[characterStaticUsecase]();
+        auto CharactersList = List.GetGeneric(
+                {CharacterStatic});
+        auto count = static_cast<BNM::Property<int>>(CharactersList.GetProperty(
+                "Count"))[characters]();
+        auto getItem = static_cast<BNM::Method<BNM::IL2CPP::Il2CppObject *>>(CharactersList.GetMethod(
+                "get_Item"))[characters];
         BNM::Method<void> AddCharacterOrExperience = UserCharactersUsecase.GetMethod(
                 "AddCharacterOrExperience")[instance];
         BNM::Property<int> Id = CharacterStatic.GetProperty("Id");
-        for (int i = 0; i < characters.size; ++i) {
-            AddCharacterOrExperience(Id[characters[i]](), 100);
+        for (int i = 0; i < count; ++i) {
+            AddCharacterOrExperience(Id[getItem(i)](), 100);
         }
     }
 }
@@ -129,6 +136,7 @@ void OnLoaded() {
                                  AssemblyCSharp);
     UserCharactersUsecase = BNM::Class("WetWealth.Characters", "UserCharactersUsecase",
                                        AssemblyCSharp);
+    List = BNM::Class("System.Collections.Generic", "List`1", BNM::Image("mscorlib"));
     auto AddCharacterTemptation = UserCharactersUsecase.GetMethod("AddCharacterTemptation");
     auto Load = UserCharactersUsecase.GetMethod("Load");
 
